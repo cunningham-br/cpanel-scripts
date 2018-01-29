@@ -1,0 +1,58 @@
+#!/usr/bin/bash
+
+LOGDESTINO="/var/log/prekillacc"
+LOG="$LOGDESTINO/prekillacct.log"
+DESTINO="/backup/terminate-account/"
+COMANDOCPANEL="/usr/local/cpanel/scripts/pkgacct"
+
+FILETMP=`date +%Y%m%d%H%M%S`
+
+mkdir -p $DESTINO $LOGDESTINO
+
+echo "-----------------" >> $LOG
+echo "Inicio -- prekillacct" >> $LOG
+date >> $LOG
+echo "Dados enviados para cancelamento::: $@" >> $LOG
+echo "" >> $LOG
+
+function terminate_account () {
+        chmod +x $COMANDOCPANEL
+
+        # Remover arquivos temporarios e de backup dos dominios
+        for user in `/bin/ls -A /var/cpanel/users` ; do rm -fv /home/$user/backup-*$user.tar.gz ; done
+        $COMANDOCPANEL $d $DESTINO &>> $LOG
+}
+
+# Obtem a lista de contas no servidor
+cat /etc/userdomains | cut -d":" -f2 | uniq  >> $LOGDESTINO/$FILETMP.tmp
+
+# Faz a validação dos parametros enviados pelo cPanel
+for d in $(cat $LOGDESTINO/$FILETMP.tmp); do
+        if [ "$d" = "$1"  ]
+        then
+                 terminate_account
+                break
+        elif [ "$d" = "$2"  ]
+        then
+                 terminate_account
+                break
+        elif [ "$d" = "$3"  ]
+        then
+                 terminate_account
+                 break
+        elif [ "$d" = "$4"  ]
+        then
+                 terminate_account
+                break
+        elif [ "$d" = "$5"  ]
+        then
+                 terminate_account
+                break
+        fi
+done
+
+rm -f $LOGDESTINO/$FILETMP.tmp
+
+echo "" >> $LOG
+echo "fim -- prekillacct" >> $LOG
+echo "-----------------" >> $LOG
